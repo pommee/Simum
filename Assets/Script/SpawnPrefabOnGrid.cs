@@ -5,7 +5,7 @@ public class SpawnPrefabOnGrid : MonoBehaviour
 {
     public GameObject prefabToSpawn;
     public Grid grid;
-    public float moveDownInterval = 1.0f; // Adjust this value to control the speed of movement
+    public float moveDownInterval = 1.0f;
 
     private List<GameObject> spawnedPrefabs = new List<GameObject>();
     private List<Vector2Int> filledCells = new List<Vector2Int>();
@@ -13,25 +13,30 @@ public class SpawnPrefabOnGrid : MonoBehaviour
 
     private void Update()
     {
-        // Spawn pixel and snap it to the grid in a cell
-        if (Input.GetMouseButtonDown(0))
+        // Spawn a bunch of pixels in a circle if mouse button is held down
+        if (Input.GetMouseButton(0))
         {
             Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            Vector3Int cellPosition = grid.WorldToCell(mouseWorldPos);
-            Vector3 spawnPosition = grid.GetCellCenterWorld(cellPosition);
-            spawnPosition.z = 0; // Set the z-coordinate to 0
+            for (int i = 0; i < 6; i++)
+            {
+                float angle = i * 10f;
+                Vector3 offset = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0) * 0.5f;
 
-            GameObject newObject = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
-            spawnedPrefabs.Add(newObject);
-            filledCells.Add(new Vector2Int(cellPosition.x, cellPosition.y));
+                Vector3Int cellPosition = grid.WorldToCell(mouseWorldPos + offset);
+                Vector3 spawnPosition = grid.GetCellCenterWorld(cellPosition);
+                spawnPosition.z = 0;
+
+                GameObject newObject = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
+                spawnedPrefabs.Add(newObject);
+                filledCells.Add(new Vector2Int(cellPosition.x, cellPosition.y));
+            }
         }
 
-        // Move all filled cells one step down after a specific time interval
         timer += Time.deltaTime;
         if (timer >= moveDownInterval)
         {
             MoveCellsDown();
-            timer = 0.0f; // Reset the timer
+            timer = 0.0f;
         }
     }
 

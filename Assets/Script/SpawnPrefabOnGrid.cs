@@ -13,7 +13,6 @@ public class SpawnPrefabOnGrid : MonoBehaviour
 
     private void Update()
     {
-        // Spawn a bunch of pixels in a circle if mouse button is held down
         if (Input.GetMouseButton(0))
         {
             Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -27,6 +26,18 @@ public class SpawnPrefabOnGrid : MonoBehaviour
                 spawnPosition.z = 0;
 
                 GameObject newObject = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity);
+                Renderer renderer = newObject.GetComponent<Renderer>();
+
+                if (renderer != null)
+                {
+                    Material material = renderer.material;
+                    Color currentColor = material.color;
+
+                    float shiftAmount = Random.Range(-0.1f, 0.1f);
+                    Color shiftedColor = currentColor + new Color(shiftAmount, shiftAmount, shiftAmount, 0);
+                    material.color = shiftedColor;
+                }
+
                 spawnedPrefabs.Add(newObject);
                 filledCells.Add(new Vector2Int(cellPosition.x, cellPosition.y));
             }
